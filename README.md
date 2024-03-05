@@ -6,6 +6,10 @@ This project is loosely based on a non-funded [ZkIgnite proposal](https://zkigni
 
 The project is divided into two phases: the first phase aims to implement the basic functionality, in a PoC style. The second phase adds required ZK privacy and succinctness.
 
+## Basic flow
+
+<img src="onramp.png">
+
 ## Phase 1
 
 The flow goes something like this:

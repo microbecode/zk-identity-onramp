@@ -14,6 +14,7 @@
     "@types/node": "20.8.9",
     "@types/react": "18.2.32",
     "@types/react-dom": "18.2.14",
+    "base-64": "^1.0.0",
     "coi-serviceworker": "^0.1.7",
     "date-fns": "^2.30.0",
     "eslint": "8.52.0",
@@ -27,6 +28,7 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
+    "@types/base-64": "^1.0.2",
     "encoding": "^0.1.13"
   },
   "peerDependencies": {

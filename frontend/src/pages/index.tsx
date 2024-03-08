@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { PublicKey, Field, Signature, JsonProof, verify, Mina } from "o1js";
 import styles from "../styles/Home.module.css";
 import React from "react";
-import { createPortal } from "react-dom";
+import { encode, decode } from "base-64";
 
 export default function Enter() {
   const [displayText, setDisplayText] = useState("");
@@ -23,7 +23,7 @@ export default function Enter() {
   }
 
   const testing = async () => {
-    const TESTNET = "https://proxy.testworld.minaexplorer.com/graphql";
+    /*  const TESTNET = "https://proxy.testworld.minaexplorer.com/graphql";
     const network = Mina.Network({
       mina: TESTNET,
     });
@@ -36,12 +36,28 @@ export default function Enter() {
       return;
     }
 
-    const publicKeyBase58: string = (await mina.requestAccounts())[0];
+    const publicKeyBase58: string = (await mina.requestAccounts())[0]; */
     //const publicKey = PublicKey.fromBase58(publicKeyBase58);
 
-    console.log("Using wallet", publicKey);
+    //console.log("Using wallet", publicKey);
+
+    const customData = "5";
+    const state = encodeState(customData);
+
+    const authUrl = `https://dev-8p0g8j7gy5jcno33.us.auth0.com/authorize?client_id=wBobus191Izqqog1Z2vJFnLu76nYO6c5&redirect_uri=https://5bfb-212-3-192-104.ngrok-free.app&response_type=code&scope=openid%20profile&state=${state}`;
+    window.location.href = authUrl;
   };
   testing();
+
+  function encodeState(data: string) {
+    const json = JSON.stringify(data);
+    return encode(json);
+  }
+
+  function decodeState(encodedState: string) {
+    const json = decode(encodedState);
+    return JSON.parse(json);
+  }
   /*   const stepDisplay = transactionlink ? (
     <a href={displayText} target="_blank" rel="noreferrer">
       View transaction

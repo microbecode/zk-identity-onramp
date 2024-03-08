@@ -11,3 +11,11 @@ It seems to be difficult to find a popular identity provider that allows to recr
 Just couldn't get Google to work, so I decided to try Auth0. It doesn't support all the same functionality, but it has the needed _nonce_ field for storing the Mina public key - ChatGPT also suggested to try using their special _state_ field for storage. Will try both.
 
 Imported empty UI also.
+
+## 8th of March
+
+Navigating Auth0's and Google's OAuth settings, trying to make them talk to each other. There are loads of settings to toggle and figure out. Authentication redirect is in place but just doesn't work yet. Custom data is being embedded in the authentication flow.
+
+Starting to use ngrok proxy to allow localhost development - authentication flow redirects now to localhost through ngrok.
+
+Added a bit of JS to start the Auth0 authentication flow.

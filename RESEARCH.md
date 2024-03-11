@@ -19,3 +19,9 @@ Navigating Auth0's and Google's OAuth settings, trying to make them talk to each
 Starting to use ngrok proxy to allow localhost development - authentication flow redirects now to localhost through ngrok.
 
 Added a bit of JS to start the Auth0 authentication flow.
+
+## 11th of March
+
+The login flow finally works. The custom data to be used for Mina is carried in the login flow successfully.
+
+The login flow issues were caused simply by misconfiguration in the cloud login settings. Also this project's frontend files were incorrect: the login was redirecting itself back to login, which caused an endless loop that gave the sensation that the login doesn't work.

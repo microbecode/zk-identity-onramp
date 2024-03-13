@@ -25,3 +25,9 @@ Added a bit of JS to start the Auth0 authentication flow.
 The login flow finally works. The custom data to be used for Mina is carried in the login flow successfully.
 
 The login flow issues were caused simply by misconfiguration in the cloud login settings. Also this project's frontend files were incorrect: the login was redirecting itself back to login, which caused an endless loop that gave the sensation that the login doesn't work.
+
+## 13th of March
+
+Trying to get the nonce to be used in our auth flow. For some reason our custom nonce is not taken into account even if we inject it in the auth flow.
+
+This may be a misconfiguration issue. Or, alternatively, Auth0 just doesn't support custom nonces, for some reason. But it does expose modifying it, which hints at the former option. But no luck so far in fixing the auth flow configuration.

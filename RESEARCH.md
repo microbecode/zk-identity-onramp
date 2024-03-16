@@ -31,3 +31,16 @@ The login flow issues were caused simply by misconfiguration in the cloud login 
 Trying to get the nonce to be used in our auth flow. For some reason our custom nonce is not taken into account even if we inject it in the auth flow.
 
 This may be a misconfiguration issue. Or, alternatively, Auth0 just doesn't support custom nonces, for some reason. But it does expose modifying it, which hints at the former option. But no luck so far in fixing the auth flow configuration.
+
+## 16th of March
+
+Currently given up on using the "ready" auth flow, since I can't get it to recognize my custom input data (nonce).
+
+Trying to create the auth flow by myself, but that appears to be not feasible. It requires all sorts of back-and-forth verification logic that is tricky to get right (for example "code verifier" and its challenge functionality).
+
+Two options remain:
+
+1. Keep trying
+1. Get rid of Auth0 and try to get things working directly with identity providers (had challenges with that approach as well earlier)
+
+I'll continue banging my head against the wall tomorrow and decide how to proceed.

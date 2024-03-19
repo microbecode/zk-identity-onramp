@@ -2,7 +2,7 @@
 
 This project aims to on-ramp off-chain identities.
 
-This project is loosely based on a non-funded [ZkIgnite proposal](https://zkignite.minaprotocol.com/zkignite/zkapp-cohort-3/finalfundingdecisions/suggestion/703), which in turn is based on [Bonday Pay](https://www.risczero.com/blog/bonsai-pay). We mostly leave the asset management things out and focus on the identity.
+This project is loosely based on a non-funded [ZkIgnite proposal](https://zkignite.minaprotocol.com/zkignite/zkapp-cohort-3/finalfundingdecisions/suggestion/703), which in turn is based on [Bonsai Pay](https://www.risczero.com/blog/bonsai-pay) and [zkLogin](https://www.youtube.com/watch?v=FrihpBU4MzY). We mostly leave the asset management things out and focus on the identity.
 
 The project is divided into two phases: the first phase aims to implement the basic functionality, in a PoC style. The second phase adds required ZK privacy and succinctness.
 

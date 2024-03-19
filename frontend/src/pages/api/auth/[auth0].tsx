@@ -2,8 +2,8 @@
 import { handleAuth, handleLogin, handleProfile } from "@auth0/nextjs-auth0";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export default handleAuth();
-/* 
+//export default handleAuth();
+
 export default handleAuth({
   async login(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -14,21 +14,21 @@ export default handleAuth({
       const state = Buffer.from("DUMMY" + Date.now()).toString("base64");
       const nonce = Buffer.from("DUMMY2" + Date.now()).toString("base64");
       const authorizationParams = {
-        state: state,
+        // state: state,
         nonce: nonce,
       };
 
       // Log authorizationParams
       console.log("Authorization params:", authorizationParams);
 
-      // Log specific properties of the request object
+      /*       // Log specific properties of the request object
       console.log("Request Method:", req.method);
-      console.log("Request URL:", req.url);
+      console.log("Request URL:", req.url); */
       console.log("Request Headers:", req.headers);
 
       // Call handleLogin with authorizationParams
       const loginResponse = await handleLogin(req, res, {
-        //authorizationParams: authorizationParams,
+        authorizationParams: authorizationParams,
       });
 
       // Log the response object from handleLogin
@@ -43,4 +43,3 @@ export default handleAuth({
     }
   },
 });
- */

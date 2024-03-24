@@ -54,3 +54,7 @@ Tried again signing up for Google Cloud, to try the flow directly there, but it 
 Tried with Twitch. After a lot of of fiddling it finally works! I use their "OIDC implicit grant flow", send to my own Twitch app stuff like "https://id.twitch.tv/oauth2/authorize?response_type=token+id_token&client_id=emwrtbs8hkk8entdq84jyrpd6za693&redirect_uri=http://localhost:3000&scope=user%3Aread%3Aemail+openid&state=abc123&nonce=abcd345" (no, there's nothing secret in that) and it gives me back a JWT token that includes the custom nonce. Great success! Now things are a bit clearer moving forward. What a relief.
 
 Will clean up code later.
+
+## 24.3.
+
+Figure out Vercel deployment and settings. Fix and deploy.

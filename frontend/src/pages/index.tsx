@@ -8,6 +8,10 @@ export default function Enter() {
   const [content, setContent] = useState<ReactNode>(null); // Update the type to ReactNode
 
   const audience = "emwrtbs8hkk8entdq84jyrpd6za693"; // Twitch client id
+  const redirect_url = process.env.NEXT_PUBLIC_REDIRECT_URL;
+  if (!redirect_url) {
+    throw new Error("Redirect URL is not defined");
+  }
 
   useEffect(() => {
     const hash = document.location.hash;
@@ -33,7 +37,7 @@ export default function Enter() {
 
       const prefix = "https://id.twitch.tv/oauth2/authorize";
       const clientId = "&client_id=" + audience;
-      const redirect = "&redirect_uri=http://localhost:3000";
+      const redirect = "&redirect_uri=" + redirect_url;
       const nonce = "&nonce=DUMMY" + Date.now();
 
       const authUrl = `${prefix}?response_type=token+id_token${clientId}${redirect}&scope=user%3Aread%3Aemail+openid${nonce}`;

@@ -30,15 +30,19 @@ export default function Enter() {
       console.log("ID Token:", idToken);
       setJwtToken(idToken);
 
+      const nonce = jose.decodeJwt(idToken).nonce as string;
+
       setIsLoggedIn(true);
-      setContent(<div>Welcome, you are now logged in</div>);
+      setContent(
+        <div>Welcome, you are now logged in with custom nonce {nonce}</div>
+      );
     } else {
       console.log("ID Token not found in the URL hash.");
 
       const prefix = "https://id.twitch.tv/oauth2/authorize";
       const clientId = "&client_id=" + audience;
       const redirect = "&redirect_uri=" + redirect_url;
-      const nonce = "&nonce=DUMMY" + Date.now();
+      const nonce = "&nonce=DUMMY-" + Date.now();
 
       const authUrl = `${prefix}?response_type=token+id_token${clientId}${redirect}&scope=user%3Aread%3Aemail+openid${nonce}`;
 

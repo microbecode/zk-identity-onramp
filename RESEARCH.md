@@ -58,3 +58,9 @@ Will clean up code later.
 ## 24.3.
 
 Figure out Vercel deployment and settings. Fix and deploy.
+
+## 1.4.
+
+Trying to figure out how Provable.witness works. I would probably need to use that for most of the heavy JWT / signature / JSON parsing things.
+
+Discussed on Discord, got some pointers but it just doesn't "click" for me. Read some o1js code examples. Doesn't make sense to try to implement this in some inferior way.

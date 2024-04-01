@@ -6,6 +6,7 @@ import {
   method,
   PublicKey,
   Signature,
+  CircuitString,
 } from 'o1js';
 
 // Add a basic Mina smart contract to verify the token and store the identity connection on-chain
@@ -22,7 +23,7 @@ export class IdentityStore extends SmartContract {
     //this.requireSignature();
   }
 
-  @method verify(publicKey: String, jwtToken: String) {
+  @method verify(publicKey: CircuitString, jwtToken: CircuitString) {
     /* TODO:
     - Store public keys in merkle tree and provide proof
     - Verify JWT token's signature: https://discord.com/channels/484437221055922177/1203469437320171610

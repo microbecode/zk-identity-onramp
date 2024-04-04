@@ -64,3 +64,9 @@ Figure out Vercel deployment and settings. Fix and deploy.
 Trying to figure out how Provable.witness works. I would probably need to use that for most of the heavy JWT / signature / JSON parsing things.
 
 Discussed on Discord, got some pointers but it just doesn't "click" for me. Read some o1js code examples. Doesn't make sense to try to implement this in some inferior way.
+
+## 3.-4.4.
+
+After quite some experimentation, I found out that it's not trivial to verify RSA signatures.
+
+Lucky for me, a ZkIgnite project has just created a RSA verification library: https://github.com/Shigoto-dev19/rsa-o1js/tree/main-dkim . Copypasted that and started experimenting with it. This will hopefully do exactly what I need, but needs more experimentation and testing.

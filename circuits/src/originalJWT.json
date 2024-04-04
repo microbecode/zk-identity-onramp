@@ -1,0 +1,18 @@
+{
+  "header": {
+    "alg": "RS256",
+    "typ": "JWT",
+    "kid": "1"
+  },
+  "payload": {
+    "aud": "emwrts8hkk8endq84jyrpd6za693",
+    "exp": 1711952997,
+    "iat": 1711952097,
+    "iss": "https://id.twitch.tv/oauth2",
+    "sub": "1054360985",
+    "at_hash": "k6KjzUCA-SuUSf7UIGvAQ",
+    "azp": "emwrts8hkk8endq84jyrpd6za693",
+    "nonce": "DUMMY-1711952086056",
+    "preferred_username": "lauritest"
+  }
+}

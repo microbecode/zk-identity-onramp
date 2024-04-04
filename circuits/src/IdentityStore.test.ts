@@ -1,11 +1,16 @@
 import {
   AccountUpdate,
+  Bytes,
   CircuitString,
+  Hash,
   Mina,
   PrivateKey,
   PublicKey,
 } from 'o1js';
 import { IdentityStore } from './IdentityStore';
+import jwtJson from './originalJWT.json';
+import { Bigint2048, rsaVerify65537 } from './rsa';
+import { generateDigestBigint, generateRsaParams, rsaSign } from './utils';
 
 const proofsEnabled = false;
 
@@ -28,7 +33,7 @@ describe('Identity', () => {
   });
 
   beforeEach(() => {
-    const Local = Mina.LocalBlockchain({ proofsEnabled });
+    /*     const Local = Mina.LocalBlockchain({ proofsEnabled });
     Mina.setActiveInstance(Local);
     ({ privateKey: deployerKey, publicKey: deployerAccount } =
       Local.testAccounts[0]);
@@ -36,7 +41,7 @@ describe('Identity', () => {
       Local.testAccounts[1]);
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new IdentityStore(zkAppAddress);
+    zkApp = new IdentityStore(zkAppAddress); */
   });
 
   async function localDeploy() {
@@ -49,17 +54,47 @@ describe('Identity', () => {
     await txn.sign([deployerKey, zkAppPrivateKey]).send();
   }
 
-  it('generates and deploys the smart contract', async () => {
+  xit('generates and deploys the smart contract', async () => {
     await localDeploy();
   });
 
   it('Hmm', async () => {
-    let token =
+    /*     let token =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTE5NTI5OTcsImlhdCI6MTcxMTk1MjA5NywiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiJrNktralVDVUEtU3VVU2Y3VUlHdkFRIiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzExOTUyMDg2MDU2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.YlT4gCed_Q9qo-aGn5eRTpQkwYRCJ_mbRUz2YqJj6kQNs3i3fBb-X0Ns5UZecipWS3AwT5pVu-TiCzSkYlWOKM9lfhVe4Rm_ZI2Tqmh6MYmup4WUmiDYqdVBR95IYCIra3YrArH4hVeYznHccD597INuo25o_qnGXhX6Qx88BWhRR6GQGv5UyAiKBATA2pLI8ezDqGf1NlNYQcl9mlifqm-wFowGhXteogXZ1bwbezmGA9ryZ8kf4qOf4eN7Iilv0IhnddSaQloqMpay3e8Mz8Hxg9HztInsd2zWB8dOHbJgqgvLN7I8Y2qyvSSEFu8DQFq-hw_ZqfOYEg1OI9RkLA';
+    const signature =
+      'YlT4gCed_Q9qo-aGn5eRTpQkwYRCJ_mbRUz2YqJj6kQNs3i3fBb-X0Ns5UZecipWS3AwT5pVu-TiCzSkYlWOKM9lfhVe4Rm_ZI2Tqmh6MYmup4WUmiDYqdVBR95IYCIra3YrArH4hVeYznHccD597INuo25o_qnGXhX6Qx88BWhRR6GQGv5UyAiKBATA2pLI8ezDqGf1NlNYQcl9mlifqm-wFowGhXteogXZ1bwbezmGA9ryZ8kf4qOf4eN7Iilv0IhnddSaQloqMpay3e8Mz8Hxg9HztInsd2zWB8dOHbJgqgvLN7I8Y2qyvSSEFu8DQFq-hw_ZqfOYEg1OI9RkLA';
+ */
+    const input = generateDigestBigint('hello world!');
+    const message = Bigint2048.from(input);
 
-    await zkApp.verify(
-      CircuitString.fromString(twitchPublicKey),
-      CircuitString.fromString(token)
-    );
+    const params = generateRsaParams(256);
+    const signature = Bigint2048.from(rsaSign(input, params.d, params.n));
+    const modulus = Bigint2048.from(params.n);
+
+    rsaVerify65537(message, signature, modulus);
+
+    /*    await zkApp.verify(
+      //   CircuitString.fromString(twitchPublicKey),
+      //  CircuitString.fromString(token),
+      CircuitString.fromString(JSON.stringify(jwtJson)),
+      CircuitString.fromString(signature)
+    ); */
+
+    //let preimage = 'The quick brown fox jumps over the lazy dog';
+    /* let preimage = JSON.stringify(jwtJson);
+    console.log('PRE: ', preimage);
+
+    const len = 320;
+
+    // create a Bytes class that represents 43 bytes
+    class Bytes43 extends Bytes(len) {}
+
+    // convert the preimage to bytes
+    let preimageBytes = Bytes43.fromString(preimage);
+
+    // hash the preimage
+    let hash = Hash.SHA2_256.hash(preimageBytes);
+
+    console.log(hash.toHex()); */
   });
 });

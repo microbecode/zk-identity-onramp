@@ -70,3 +70,15 @@ Discussed on Discord, got some pointers but it just doesn't "click" for me. Read
 After quite some experimentation, I found out that it's not trivial to verify RSA signatures.
 
 Lucky for me, a ZkIgnite project has just created a RSA verification library: https://github.com/Shigoto-dev19/rsa-o1js/tree/main-dkim . Copypasted that and started experimenting with it. This will hopefully do exactly what I need, but needs more experimentation and testing.
+
+## 6.4.
+
+Trying to verify Twitch's JWT token signature with the existing tooling. But just can't get it to verify.
+
+Options:
+
+1. I do something wrong
+1. The use library (From the other project) has limitations / issues
+1. I've misunderstood how this is supposed to work, somehow
+
+I'll keep on trying, but not very encouraging currently.

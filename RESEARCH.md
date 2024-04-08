@@ -82,3 +82,9 @@ Options:
 1. I've misunderstood how this is supposed to work, somehow
 
 I'll keep on trying, but not very encouraging currently.
+
+## 8.4.
+
+Trying to verify the signature with other libraries, but no luck so far. Various stupid typescript issues (the RSA verification libraries don't have typescript bindings and adding that manually fails). Will try other packages later.
+
+THe verification really should work with other libraries. And when it does, I'll find out that there's either a problem in the used o1js RSA verification library or I use it wrong.

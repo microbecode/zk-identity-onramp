@@ -11,6 +11,9 @@ import { IdentityStore } from './IdentityStore';
 import jwtJson from './originalJWT.json';
 import { Bigint2048, rsaVerify65537 } from './rsa';
 import { generateDigestBigint, generateRsaParams, rsaSign } from './utils';
+import NodeRSA, { Format } from 'node-rsa';
+import * as crypto from 'crypto';
+import { Ber, BerReader, BerWriter } from 'asn1.js';
 
 const proofsEnabled = false;
 
@@ -58,7 +61,84 @@ describe('Identity', () => {
     await localDeploy();
   });
 
-  it('Hmm', async () => {
+  it('other', async () => {
+    interface PublicKey {
+      alg: string;
+      e: string;
+      kid: string;
+      kty: string;
+      n: string;
+      use: string;
+    }
+
+    const publicKey: PublicKey = {
+      alg: 'RS256',
+      e: 'AQAB',
+      kid: '1',
+      kty: 'RSA',
+      n: '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw',
+      use: 'sig',
+    };
+
+    function convertPublicKeyToPem(publicKey: PublicKey): string {
+      const n = Buffer.from(publicKey.n, 'base64');
+      const e = Buffer.from(publicKey.e, 'base64');
+
+      const writer = new BerWriter();
+      writer.startSequence();
+
+      // Write the modulus
+      writer.writeBuffer(n, Ber.OctetString);
+
+      // Write the public exponent
+      writer.writeBuffer(e, Ber.Integer);
+
+      writer.endSequence();
+
+      const publicKeyDer = writer.data;
+
+      const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyDer.toString(
+        'base64'
+      )}\n-----END PUBLIC KEY-----`;
+
+      return publicKeyPem;
+    }
+
+    const jwtToken =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTIzMDI2NDQsImlhdCI6MTcxMjMwMTc0NCwiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiIycXRtVUNsZVd6Mm9iZlFwLVlmdWp3IiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzEyMzAxNzMyOTk4IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.o5KsUTrr1TWz_sZVsjMvcJCBZInV3MlJO9nN0y7BOZjsAVw5Zv71twV3KQ3-0gBhr8lCXkqIXwfTstUSUyqM67GMDMskbahgg4w612uzvK7_kXZCjld9ynqCNyvz69g1vN7WAhojMZCjsGUEGfZ-Dthh1E4Bt-CyWmCXmtcMkY1ZMKa4MaCGPxbbulX8gNbM3B3aUHMFUVyZJ18PSbpqXzq0MZcBEZY4zdRTvM5gnE2M3FTcGvh8S3wfwoUFAy0rrEEnlAGD6t6PaFWkHxFcUW4uy3p01I9GgOjMO6sN25xZnOqSBMQl41h9IYx5sJNQEJe_AB8nDndNYeMAS-4LOw';
+    /*    const pubKey = {
+      alg: 'RS256',
+      e: 'AQAB',
+      kid: '1',
+      kty: 'RSA',
+      n: '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw',
+      use: 'sig',
+    }; */
+
+    const jwtParts = jwtToken.split('.');
+    const header = JSON.parse(
+      Buffer.from(jwtParts[0], 'base64url').toString('utf8')
+    );
+    const payload = Buffer.from(jwtParts[1], 'base64url').toString('utf8');
+    const signature = Buffer.from(jwtParts[2], 'base64url');
+
+    /*  const pubKey = new NodeRSA(publicKey.n, 'base64' as Format, {
+      encryptionScheme: 'pkcs1',
+    }); */
+    const publicKeyPem = convertPublicKeyToPem(publicKey);
+    const publicKeyInstance = new NodeRSA(publicKeyPem, 'public');
+
+    const crypto = require('crypto');
+    const hash = crypto.createHash(header.alg.replace('RS', 'sha'));
+    const messageDigest = hash
+      .update(Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`))
+      .digest();
+
+    const isSignatureValid = publicKeyInstance.verify(messageDigest, signature);
+    console.log(`Signature is ${isSignatureValid ? 'valid' : 'invalid'}`);
+  });
+
+  xit('Hmm', async () => {
     /*     let token =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTE5NTI5OTcsImlhdCI6MTcxMTk1MjA5NywiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiJrNktralVDVUEtU3VVU2Y3VUlHdkFRIiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzExOTUyMDg2MDU2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.YlT4gCed_Q9qo-aGn5eRTpQkwYRCJ_mbRUz2YqJj6kQNs3i3fBb-X0Ns5UZecipWS3AwT5pVu-TiCzSkYlWOKM9lfhVe4Rm_ZI2Tqmh6MYmup4WUmiDYqdVBR95IYCIra3YrArH4hVeYznHccD597INuo25o_qnGXhX6Qx88BWhRR6GQGv5UyAiKBATA2pLI8ezDqGf1NlNYQcl9mlifqm-wFowGhXteogXZ1bwbezmGA9ryZ8kf4qOf4eN7Iilv0IhnddSaQloqMpay3e8Mz8Hxg9HztInsd2zWB8dOHbJgqgvLN7I8Y2qyvSSEFu8DQFq-hw_ZqfOYEg1OI9RkLA';
     const signature =
@@ -75,7 +155,6 @@ describe('Identity', () => {
     // Assuming JWT token and publicKey are provided
     const jwtToken =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTIzMDI2NDQsImlhdCI6MTcxMjMwMTc0NCwiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiIycXRtVUNsZVd6Mm9iZlFwLVlmdWp3IiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzEyMzAxNzMyOTk4IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.o5KsUTrr1TWz_sZVsjMvcJCBZInV3MlJO9nN0y7BOZjsAVw5Zv71twV3KQ3-0gBhr8lCXkqIXwfTstUSUyqM67GMDMskbahgg4w612uzvK7_kXZCjld9ynqCNyvz69g1vN7WAhojMZCjsGUEGfZ-Dthh1E4Bt-CyWmCXmtcMkY1ZMKa4MaCGPxbbulX8gNbM3B3aUHMFUVyZJ18PSbpqXzq0MZcBEZY4zdRTvM5gnE2M3FTcGvh8S3wfwoUFAy0rrEEnlAGD6t6PaFWkHxFcUW4uy3p01I9GgOjMO6sN25xZnOqSBMQl41h9IYx5sJNQEJe_AB8nDndNYeMAS-4LOw';
-
     const publicKey = {
       alg: 'RS256',
       e: 'AQAB',
@@ -84,17 +163,17 @@ describe('Identity', () => {
       n: '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw',
       use: 'sig',
     };
+
     // Helper function to decode Base64url to Base64
     function base64urlToBase64(base64url: string) {
       const padding = '='.repeat((4 - (base64url.length % 4)) % 4);
       const base64 = (base64url + padding)
         .replace(/-/g, '+')
         .replace(/_/g, '/');
-
       return base64;
     }
 
-    function bufferToBigInt(buf: Buffer) {
+    function bufferToBigInt(buf: any) {
       let result = 0n;
       for (const byte of buf) {
         result = (result << 8n) + BigInt(byte);
@@ -118,8 +197,6 @@ describe('Identity', () => {
       base64urlToBase64(jwtToken.split('.')[1]),
       'base64'
     ).toString();
-
-    console.log('payload', jwtPayload);
 
     // Generate a digest BigInt from the payload
     const messageBigInt = Bigint2048.from(generateDigestBigint(jwtPayload));

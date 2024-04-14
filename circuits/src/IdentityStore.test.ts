@@ -13,7 +13,8 @@ import { Bigint2048, rsaVerify65537 } from './rsa';
 import { generateDigestBigint, generateRsaParams, rsaSign } from './utils';
 import NodeRSA, { Format } from 'node-rsa';
 import * as crypto from 'crypto';
-import { Ber, BerReader, BerWriter } from 'asn1.js';
+import jwt from 'jsonwebtoken';
+import jwksClient from 'jwks-rsa';
 
 const proofsEnabled = false;
 
@@ -61,81 +62,43 @@ describe('Identity', () => {
     await localDeploy();
   });
 
-  it('other', async () => {
-    interface PublicKey {
-      alg: string;
-      e: string;
-      kid: string;
-      kty: string;
-      n: string;
-      use: string;
-    }
-
-    const publicKey: PublicKey = {
-      alg: 'RS256',
-      e: 'AQAB',
-      kid: '1',
-      kty: 'RSA',
-      n: '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw',
-      use: 'sig',
-    };
-
-    function convertPublicKeyToPem(publicKey: PublicKey): string {
-      const n = Buffer.from(publicKey.n, 'base64');
-      const e = Buffer.from(publicKey.e, 'base64');
-
-      const writer = new BerWriter();
-      writer.startSequence();
-
-      // Write the modulus
-      writer.writeBuffer(n, Ber.OctetString);
-
-      // Write the public exponent
-      writer.writeBuffer(e, Ber.Integer);
-
-      writer.endSequence();
-
-      const publicKeyDer = writer.data;
-
-      const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyDer.toString(
-        'base64'
-      )}\n-----END PUBLIC KEY-----`;
-
-      return publicKeyPem;
-    }
-
+  it('regular libraries work', async () => {
+    const jwkClient = jwksClient({
+      jwksUri: 'https://id.twitch.tv/oauth2/keys',
+    });
     const jwtToken =
-      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTIzMDI2NDQsImlhdCI6MTcxMjMwMTc0NCwiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiIycXRtVUNsZVd6Mm9iZlFwLVlmdWp3IiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzEyMzAxNzMyOTk4IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.o5KsUTrr1TWz_sZVsjMvcJCBZInV3MlJO9nN0y7BOZjsAVw5Zv71twV3KQ3-0gBhr8lCXkqIXwfTstUSUyqM67GMDMskbahgg4w612uzvK7_kXZCjld9ynqCNyvz69g1vN7WAhojMZCjsGUEGfZ-Dthh1E4Bt-CyWmCXmtcMkY1ZMKa4MaCGPxbbulX8gNbM3B3aUHMFUVyZJ18PSbpqXzq0MZcBEZY4zdRTvM5gnE2M3FTcGvh8S3wfwoUFAy0rrEEnlAGD6t6PaFWkHxFcUW4uy3p01I9GgOjMO6sN25xZnOqSBMQl41h9IYx5sJNQEJe_AB8nDndNYeMAS-4LOw';
-    /*    const pubKey = {
-      alg: 'RS256',
-      e: 'AQAB',
-      kid: '1',
-      kty: 'RSA',
-      n: '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw',
-      use: 'sig',
-    }; */
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTMwOTg4NTYsImlhdCI6MTcxMzA5Nzk1NiwiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiI2cUEwZk96OGctckJ2SzIzUUx0LTJRIiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzEzMDk3OTMxMTE0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.mc8KbPhaHFeFBmtEDXgGhbZn23v0DRRk0Pf87vPT4DAgWYFGCeg4XcW0dESze_nN9XpWY9X-Aa9OEgfsaoEbIgZxJBCMKSIOg01qDvXIA3kbXyvvpylJLmD1iDahJiofRkyBK0UiIWTmpH2xJNQVo1Qqhqh68-OdK3UR4aRgzkzZLCvLvDCeBOB6HPSdrzIc1LeQF2KXMFJe_QDLYE1cyMFvfiZX7Z-xjHHEIKnO__W0nzbBncdYhVAW9GQBieKG-wMv_WaH46eN5D580NM8cOxTDFPu1d0r_dBHEdRG-R9lmN1sOSNIpOn-xN4Hg-Ds56212kElaX1Hb1CZLK3g6w';
 
-    const jwtParts = jwtToken.split('.');
-    const header = JSON.parse(
-      Buffer.from(jwtParts[0], 'base64url').toString('utf8')
-    );
-    const payload = Buffer.from(jwtParts[1], 'base64url').toString('utf8');
-    const signature = Buffer.from(jwtParts[2], 'base64url');
+    let cert = '';
 
-    /*  const pubKey = new NodeRSA(publicKey.n, 'base64' as Format, {
-      encryptionScheme: 'pkcs1',
-    }); */
-    const publicKeyPem = convertPublicKeyToPem(publicKey);
-    const publicKeyInstance = new NodeRSA(publicKeyPem, 'public');
+    const decoded = jwt.decode(jwtToken, { complete: true });
+    if (decoded === null) {
+      console.error('Invalid jwt token');
+    } else {
+      const payload = decoded.payload;
+      const header = decoded.header;
+      const kid = header.kid;
+      console.log('dumdum');
 
-    const crypto = require('crypto');
-    const hash = crypto.createHash(header.alg.replace('RS', 'sha'));
-    const messageDigest = hash
-      .update(Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`))
-      .digest();
+      //const kid = 'RkI5MjI5OUY5ODc1N0Q4QzM0OUYzNkVGMTJDOUEzQkFCOTU3NjE2Rg';
+      const key = await jwkClient.getSigningKey(kid);
+      const signingKey = key.getPublicKey();
 
-    const isSignatureValid = publicKeyInstance.verify(messageDigest, signature);
-    console.log(`Signature is ${isSignatureValid ? 'valid' : 'invalid'}`);
+      /* jwkClient.getSigningKey(kid, (err, key) => {
+        if (err || !key) {
+          console.error('somt', err, key);
+        }
+        cert = key!.getPublicKey(); */
+      cert =
+        '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw';
+      jwt.verify(jwtToken, signingKey, (err, verfied) => {
+        if (err) {
+          console.error('somt2', err);
+        }
+        console.log('verified!', verfied);
+      });
+      // });
+    }
   });
 
   xit('Hmm', async () => {

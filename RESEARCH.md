@@ -88,3 +88,11 @@ I'll keep on trying, but not very encouraging currently.
 Trying to verify the signature with other libraries, but no luck so far. Various stupid typescript issues (the RSA verification libraries don't have typescript bindings and adding that manually fails). Will try other packages later.
 
 THe verification really should work with other libraries. And when it does, I'll find out that there's either a problem in the used o1js RSA verification library or I use it wrong.
+
+## 14.4.
+
+Found a JWT library that works with TS. Tested token verification and it (unsurprisingly) works.
+
+So the problem is either in the used o1js library or in how I use it.
+
+Started discussing with the creator about the problem.

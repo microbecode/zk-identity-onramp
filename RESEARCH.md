@@ -96,3 +96,9 @@ Found a JWT library that works with TS. Tested token verification and it (unsurp
 So the problem is either in the used o1js library or in how I use it.
 
 Started discussing with the creator about the problem.
+
+## 18.4.
+
+Discussed with the o1js library creators. My problem is most likely related to encoding / padding / transformations.
+
+Started debugging what the regular JWT library does. Changing all my stuff to use the same formats, but still no luck. More experimenting still needed.

@@ -11,6 +11,7 @@ import {
   Hash,
   Provable,
 } from 'o1js';
+import { Bigint2048 } from './rsa';
 
 // Add a basic Mina smart contract to verify the token and store the identity connection on-chain
 
@@ -29,8 +30,8 @@ export class IdentityStore extends SmartContract {
   @method verify(
     //   publicKey: CircuitString,
     //  jwtToken: CircuitString,
-    originalJSON: CircuitString,
-    signature: CircuitString
+    originalJSON: Bigint2048,
+    signature: Bigint2048
   ) {
     const len = 320;
 

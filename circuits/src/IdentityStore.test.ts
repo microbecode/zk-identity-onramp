@@ -145,7 +145,7 @@ describe('Identity', () => {
       return result;
     }
 
-    const getSignature = () => {
+    const getPublicKey = () => {
       const orig =
         '{"keys":[{"alg":"RS256","e":"AQAB","kid":"1","kty":"RSA","n":"6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw","use":"sig"}]}';
       let aaa: JWK = {
@@ -168,10 +168,20 @@ describe('Identity', () => {
     // Decode modulus (n) and convert to BigInt2048
     const modulusDecoded = Buffer.from(
       //base64urlToBase64(publicKey.n),
-      publicKey.n,
-      'base64'
+      getPublicKey(),
+      'utf-8'
     );
-    const modulusBigInt = Bigint2048.from(bufferToBigInt(modulusDecoded));
+
+    // Decode Base64url and convert to a Buffer
+    const buffer = Buffer.from(publicKey.n, 'base64');
+
+    // Convert Buffer to hex string
+    const hexString = buffer.toString('hex');
+
+    // Parse hex string as a BigInt
+    const modulusBigInt = Bigint2048.from(BigInt(`0x${hexString}`));
+
+    // const modulusBigInt = Bigint2048.from(bufferToBigInt(modulusDecoded));
 
     // Decode JWT signature and convert to BigInt2048
     const jwtSignatureBuffer = Buffer.from(jwtToken.split('.')[2], 'base64url');
@@ -190,25 +200,29 @@ describe('Identity', () => {
     }
 
     const pureSig = toBase64(jwtToken.split('.')[2]);
+    const sigg = pureSig;
 
     const signatureBigInt = Bigint2048.from(
-      bufferToBigInt(Buffer.from(getSignature(), 'utf-8'))
+      bufferToBigInt(Buffer.from(sigg, 'base64'))
     );
     //Bigint2048.from(bufferToBigInt(jwtSignatureBuffer));
 
     // Decode JWT payload and convert to string
-    /* const jwtPayload = Buffer.from(
-      base64urlToBase64(jwtToken.split('.')[1]),
-      'base64'
-    ).toString(); */
+    const jwtPayload = Buffer.from(
+      jwtToken.split('.', 2).join('.'),
+      'base64url'
+    );
 
-    const jwtPayload = jwtToken.split('.', 2).join('.');
+    //const jwtPayload = jwtToken.split('.', 2).join('.');
     //const jwtPayload = toBase64(usepayload);
 
     console.log('payload', jwtPayload);
 
+    // Convert DER encoded key to BigInt
+    const messageInt = bufferToBigInt(jwtPayload); // BigInt('0x' + jwtPayload.toString('hex'));
+
     // Generate a digest BigInt from the payload
-    const messageBigInt = Bigint2048.from(generateDigestBigint(jwtPayload));
+    const messageBigInt = Bigint2048.from(messageInt);
 
     // Verify the signature
     rsaVerify65537(messageBigInt, signatureBigInt, modulusBigInt);

@@ -102,3 +102,9 @@ Started discussing with the creator about the problem.
 Discussed with the o1js library creators. My problem is most likely related to encoding / padding / transformations.
 
 Started debugging what the regular JWT library does. Changing all my stuff to use the same formats, but still no luck. More experimenting still needed.
+
+## 21.4.
+
+Given up on the JWT verification for now. Super difficult to debug since the used o1js library takes inputs in different format as "regular" JWT libraries - tried to verify that data is the same (with regular JWT library and used o1js library) as far as possible, but at some point, when the data format differs, something goes wrong.
+
+Will try to work on the other milestones.

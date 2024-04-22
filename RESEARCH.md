@@ -108,3 +108,9 @@ Started debugging what the regular JWT library does. Changing all my stuff to us
 Given up on the JWT verification for now. Super difficult to debug since the used o1js library takes inputs in different format as "regular" JWT libraries - tried to verify that data is the same (with regular JWT library and used o1js library) as far as possible, but at some point, when the data format differs, something goes wrong.
 
 Will try to work on the other milestones.
+
+## 22.4.
+
+Started parsing the JWT payload.
+
+Good progress on base64 decoding. It was pointed out that I could use https://github.com/o1-labs/o1js-bindings/blob/main/crypto/bigint-helpers.ts#L101 for performance reasons, but I never got that working. With some help from ChatGPT I got base64 decoding working without that library, so it's probably not very efficient currently. But it works.

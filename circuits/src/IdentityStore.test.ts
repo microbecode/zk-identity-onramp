@@ -38,7 +38,7 @@ describe('Identity', () => {
   });
 
   beforeEach(() => {
-    /*     const Local = Mina.LocalBlockchain({ proofsEnabled });
+    const Local = Mina.LocalBlockchain({ proofsEnabled });
     Mina.setActiveInstance(Local);
     ({ privateKey: deployerKey, publicKey: deployerAccount } =
       Local.testAccounts[0]);
@@ -46,7 +46,7 @@ describe('Identity', () => {
       Local.testAccounts[1]);
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new IdentityStore(zkAppAddress); */
+    zkApp = new IdentityStore(zkAppAddress);
   });
 
   async function localDeploy() {
@@ -61,6 +61,11 @@ describe('Identity', () => {
 
   xit('generates and deploys the smart contract', async () => {
     await localDeploy();
+  });
+
+  it('calls the contract', async () => {
+    await localDeploy();
+    zkApp.verify();
   });
 
   xit('regular libraries work', async () => {
@@ -291,7 +296,7 @@ describe('Identity', () => {
     console.log(hash.toHex()); */
   });
 
-  it('base64 decoding', async () => {
+  xit('base64 decoding', async () => {
     //let encoded = 'aGVsbG8gdGhlcmU='; // 'hello there'
     /* 
     let nums = [5n, 16n];

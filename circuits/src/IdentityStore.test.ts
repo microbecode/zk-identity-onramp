@@ -300,9 +300,15 @@ describe('Identity', () => {
     console.log('RESSSSS', res); */
     // Convert a single character to its ASCII value
 
-    // Base64url decoding function
-    function base64urlDecode(encodedString: string): string {
-      // Base64url characters
+    // Example base64url-encoded string
+    //  const encodedString: string = 'SGVsbG8gV29ybGQh';
+    const delimitedString =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTMwOTg4NTYsImlhdCI6MTcxMzA5Nzk1NiwiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiI2cUEwZk96OGctckJ2SzIzUUx0LTJRIiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzEzMDk3OTMxMTE0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.mc8KbPhaHFeFBmtEDXgGhbZn23v0DRRk0Pf87vPT4DAgWYFGCeg4XcW0dESze_nN9XpWY9X-Aa9OEgfsaoEbIgZxJBCMKSIOg01qDvXIA3kbXyvvpylJLmD1iDahJiofRkyBK0UiIWTmpH2xJNQVo1Qqhqh68-OdK3UR4aRgzkzZLCvLvDCeBOB6HPSdrzIc1LeQF2KXMFJe_QDLYE1cyMFvfiZX7Z-xjHHEIKnO__W0nzbBncdYhVAW9GQBieKG-wMv_WaH46eN5D580NM8cOxTDFPu1d0r_dBHEdRG-R9lmN1sOSNIpOn-xN4Hg-Ds56212kElaX1Hb1CZLK3g6w';
+
+    let parts = delimitedString.split('.');
+
+    // Decode the base64url-encoded string
+    function decode(encodedString: string): string {
       const base64urlChars =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
@@ -338,16 +344,12 @@ describe('Identity', () => {
       }
 
       // Convert the decoded bytes to characters and join them into a string
-      const decodedString = String.fromCharCode(...decodedBytes);
-
-      return decodedString;
+      const decoded = String.fromCharCode(...decodedBytes);
+      return decoded;
     }
 
-    // Example base64url-encoded string
-    const base64urlEncoded: string = 'SGVsbG8gV29ybGQh';
+    let payload = decode(parts[1]);
 
-    // Decode the base64url-encoded string
-    const decoded: string = base64urlDecode(base64urlEncoded);
-    console.log(decoded); // Output: "Hello World!"
+    console.log(payload);
   });
 });

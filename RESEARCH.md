@@ -114,3 +114,9 @@ Will try to work on the other milestones.
 Started parsing the JWT payload.
 
 Good progress on base64 decoding. It was pointed out that I could use https://github.com/o1-labs/o1js-bindings/blob/main/crypto/bigint-helpers.ts#L101 for performance reasons, but I never got that working. With some help from ChatGPT I got base64 decoding working without that library, so it's probably not very efficient currently. But it works.
+
+## 24.4.
+
+Started JSON parsing to get data out of the decoded JWT payload.
+
+It was suggested to me to use https://github.com/gretzke/zkApp-data-types/blob/main/src/jsonParsing.ts but it turns out that's 2 years old and not compatible anymore. I tried fixing it but failed. Talked with the creator and he said he's not maintaining it anymore. Well that's a bummer. Have to try to figure out something else.

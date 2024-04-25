@@ -2,8 +2,13 @@ import {
   AccountUpdate,
   Bytes,
   CircuitString,
+  Encoding,
+  Field,
   Hash,
+  MerkleTree,
+  MerkleWitness,
   Mina,
+  Poseidon,
   PrivateKey,
   PublicKey,
 } from 'o1js';
@@ -18,6 +23,7 @@ import jwkToPem, { JWK } from 'jwk-to-pem';
 import { changeBase, parseHexString32 } from './bigint-helpers';
 
 const proofsEnabled = false;
+const treeHeight = 10;
 
 describe('Identity', () => {
   let deployerAccount: PublicKey,
@@ -32,6 +38,7 @@ describe('Identity', () => {
   // https://id.twitch.tv/oauth2/keys
   const twitchPublicKey =
     '6lq9MQ-q6hcxr7kOUp-tHlHtdcDsVLwVIw13iXUCvuDOeCi0VSuxCCUY6UmMjy53dX00ih2E4Y4UvlrmmurK0eG26b-HMNNAvCGsVXHU3RcRhVoHDaOwHwU72j7bpHn9XbP3Q3jebX6KIfNbei2MiR0Wyb8RZHE-aZhRYO8_-k9G2GycTpvc-2GBsP8VHLUKKfAs2B6sW3q3ymU6M0L-cFXkZ9fHkn9ejs-sqZPhMJxtBPBxoUIUQFTgv4VXTSv914f_YkNw-EjuwbgwXMvpyr06EyfImxHoxsZkFYB-qBYHtaMxTnFsZBr6fn8Ha2JqT1hoP7Z5r5wxDu3GQhKkHw';
+  let tree = new MerkleTree(treeHeight);
 
   beforeAll(async () => {
     if (proofsEnabled) await IdentityStore.compile();
@@ -53,8 +60,9 @@ describe('Identity', () => {
     const txn = await Mina.transaction(deployerAccount, () => {
       AccountUpdate.fundNewAccount(deployerAccount);
       zkApp.deploy();
+      zkApp.initState(tree.getRoot());
     });
-    // await txn.prove();
+    await txn.prove();
     // this tx needs .sign(), because `deploy()` adds an account update that requires signature authorization
     await txn.sign([deployerKey, zkAppPrivateKey]).send();
   }
@@ -63,9 +71,40 @@ describe('Identity', () => {
     await localDeploy();
   });
 
-  it('calls the contract', async () => {
+  it('calls verification', async () => {
     await localDeploy();
     zkApp.verify();
+  });
+
+  it('stores merkle connection between email and public key', async () => {
+    await localDeploy();
+
+    class MerkleWitnessSet extends MerkleWitness(treeHeight) {}
+
+    let tree = new MerkleTree(treeHeight);
+
+    // Add some public key + email combinations
+    for (let i = 0; i < 10; i++) {
+      const newKey = PrivateKey.random();
+      const publicKey = newKey.toPublicKey();
+      const email = `my.email${i}@mail.com`;
+      const emailFields = Encoding.stringToFields(email);
+      const hash = Poseidon.hash([...publicKey.toFields(), ...emailFields]);
+
+      const txn = await Mina.transaction(senderAccount, () => {
+        tree.setLeaf(BigInt(i), hash);
+
+        let witness = new MerkleWitnessSet(tree.getWitness(BigInt(i)));
+
+        zkApp.store(witness, hash);
+      });
+      await txn.prove();
+      await txn.sign([senderKey, zkAppPrivateKey]).send();
+
+      zkApp.userPublicKeyRoot
+        .get()
+        .assertEquals(tree.getRoot(), 'not matching roots');
+    }
   });
 
   xit('regular libraries work', async () => {

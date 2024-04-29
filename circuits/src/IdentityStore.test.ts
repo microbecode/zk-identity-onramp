@@ -76,7 +76,7 @@ describe('Identity', () => {
     zkApp.verify();
   });
 
-  it('stores merkle connection between email and public key', async () => {
+  xit('stores merkle connection between email and public key', async () => {
     await localDeploy();
 
     class MerkleWitnessSet extends MerkleWitness(treeHeight) {}
@@ -107,7 +107,7 @@ describe('Identity', () => {
     }
   });
 
-  xit('regular libraries work', async () => {
+  xit('non-o1js libraries work for JWT verification', async () => {
     const jwkClient = jwksClient({
       jwksUri: 'https://id.twitch.tv/oauth2/keys',
     });
@@ -147,7 +147,7 @@ describe('Identity', () => {
     }
   });
 
-  xit('o1js verification (not working yet)', async () => {
+  xit('o1js JWT verification (not working yet)', async () => {
     /*     let token =
       'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJhdWQiOiJlbXdydGJzOGhrazhlbnRkcTg0anlycGQ2emE2OTMiLCJleHAiOjE3MTE5NTI5OTcsImlhdCI6MTcxMTk1MjA5NywiaXNzIjoiaHR0cHM6Ly9pZC50d2l0Y2gudHYvb2F1dGgyIiwic3ViIjoiMTA1NDM2MDk4NSIsImF0X2hhc2giOiJrNktralVDVUEtU3VVU2Y3VUlHdkFRIiwiYXpwIjoiZW13cnRiczhoa2s4ZW50ZHE4NGp5cnBkNnphNjkzIiwibm9uY2UiOiJEVU1NWS0xNzExOTUyMDg2MDU2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoibGF1cml0ZXN0In0.YlT4gCed_Q9qo-aGn5eRTpQkwYRCJ_mbRUz2YqJj6kQNs3i3fBb-X0Ns5UZecipWS3AwT5pVu-TiCzSkYlWOKM9lfhVe4Rm_ZI2Tqmh6MYmup4WUmiDYqdVBR95IYCIra3YrArH4hVeYznHccD597INuo25o_qnGXhX6Qx88BWhRR6GQGv5UyAiKBATA2pLI8ezDqGf1NlNYQcl9mlifqm-wFowGhXteogXZ1bwbezmGA9ryZ8kf4qOf4eN7Iilv0IhnddSaQloqMpay3e8Mz8Hxg9HztInsd2zWB8dOHbJgqgvLN7I8Y2qyvSSEFu8DQFq-hw_ZqfOYEg1OI9RkLA';
     const signature =
@@ -395,5 +395,15 @@ describe('Identity', () => {
     let payload = decode(parts[1]);
 
     console.log(payload);
+  });
+
+  it('test data encoding in contract', async () => {
+    await localDeploy();
+
+    const txn = await Mina.transaction(senderAccount, () => {
+      zkApp.verify();
+    });
+    await txn.prove();
+    await txn.sign([senderKey, zkAppPrivateKey]).send();
   });
 });

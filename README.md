@@ -45,37 +45,17 @@ There are a few open issues that don't have a good solution thought of, currentl
 
 ## Developer info
 
-For running this locally, you need to do the following setup.
+For running this locally, you a Twitch account with API setup.
 
-### Serveo
+### Twitch setup
 
-Use serveo.net (instead of ngrok) to establish a tunnel to localhost, for faster development:
+Go to the Twitch Console at https://dev.twitch.tv/console/apps . Register a new application:
 
-1. Create a keypair locally: `ssh-keygen`. I named my key "serveo_key" and stored it in this folder
-1. Think of some name for your tunnel (I use "minaidentity"). Change this in the next command
-1. If your keypair's name is "serveo_key", login to serveo with `ssh -i ./serveo_key -R minaidentity:80:localhost:3000 serveo.net` and click one of the auth links.
-1. Execute the same command again to get a static tunnel name.
+- URL: http://localhost:3000
+- Client type: confidential
 
-### Google Console
+Change the "audience" in index.tsx to use your Twitch client ID.
 
-1. Login to your Google Console
-1. Create a project
-1. Go to APIs & Services
-1. Create Oauth2 credential. Add your serveo tunnel URL as allowed JavaScript URL and redirect URL
-1. Note the ClientID and Client Secret
+### Run frontend
 
-### Auth0
-
-1. Create a auth0 account
-1. Create a new app in Auth0
-1. Add your tunnel address to the "application login url" with suffix "/login" and "allowed callback urls" without the suffix.
-1. Go to Authentication -> Social
-1. Create a Google connection. Enter the Client Secret from Google. No other settings needed
-
-#### Back to Google
-
-Go back to Google Console and add the Auth0 URL with suffix /login/callback to the "Authorized redirect URLs". Something like this: `https://dev-blah.us.auth0.com/login/callback`.
-
-### Local files
-
-Go to login.tsc and modify the REDIRECT_URL to be the tunnel address. After that, login via http://localhost:3000/login with Google should work.
+Run the frontend from the `frontend` folder with `npm run dev`, open the site and login with your Twitch account.
